@@ -16,6 +16,7 @@ export interface jettonMasterAndWalletMap extends jettonMasterAndWallet{
 
 export interface depositEvent {
     comment: string,
+    timestamp: number,
     txhash: string,
     tokenName: string,
     jettonAmount: string,

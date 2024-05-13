@@ -74,6 +74,7 @@ export class JettonDeposit {
                 }
                 depositEventList.push({
                     comment,
+                    timestamp: tx.now,
                     txhash: tx.hash().toString('hex'),
                     tokenName: findSupportJetton.tokenName,
                     jettonAmount: BigNumber(jettonAmount.toString()).div(BigNumber(10).pow(findSupportJetton.decimal)).toString(),
