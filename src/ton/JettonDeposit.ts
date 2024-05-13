@@ -39,45 +39,50 @@ export class JettonDeposit {
             limit,
         })
         for (const tx of transactions) {
-            const inMsg = tx.inMessage
-            // we only process internal messages here because they are used the most
-            // for external messages some of the fields are empty, but the main structure is similar
-            if(!(inMsg?.info.type == 'internal')) continue
-            let comment = ''
-            const sender = inMsg?.info.src
-            const originalBody = inMsg?.body.beginParse()
-            let body = originalBody.clone()
+            try {
+                const inMsg = tx.inMessage
+                // we only process internal messages here because they are used the most
+                // for external messages some of the fields are empty, but the main structure is similar
+                if(!(inMsg?.info.type == 'internal')) continue
+                let comment = ''
+                const sender = inMsg?.info.src
+                const originalBody = inMsg?.body.beginParse()
+                let body = originalBody.clone()
 
-            if(body.remainingBits < 32) continue
-            const op = body.loadUint(32)
-            // check jetton transfer
-            if(op != 0x7362d09c) continue
+                if(body.remainingBits < 32) continue
+                const op = body.loadUint(32)
+                // check jetton transfer
+                if(op != 0x7362d09c) continue
 
-            // 
-            const findSupportJetton = this.jettonMasterAndWalletMapList.find((item) => item.JettonWallet.equals(sender))
-            if(!findSupportJetton) continue
+                // 
+                const findSupportJetton = this.jettonMasterAndWalletMapList.find((item) => item.JettonWallet.equals(sender))
+                if(!findSupportJetton) continue
 
-            body.skip(64) // skip query_id
-            const jettonAmount = body.loadCoins()
-            const jettonSender = body.loadAddressAny()
-            if(!jettonSender) continue
-            const originalForwardPayload = body.loadBit() ? body.loadRef().beginParse() : body
-            let forwardPayload = originalForwardPayload.clone()
+                body.skip(64) // skip query_id
+                const jettonAmount = body.loadCoins()
+                const jettonSender = body.loadAddressAny()
+                if(!jettonSender) continue
+                const originalForwardPayload = body.loadBit() ? body.loadRef().beginParse() : body
+                let forwardPayload = originalForwardPayload.clone()
 
-            if (forwardPayload.remainingBits >= 32) {
-                const forwardOp = forwardPayload.loadUint(32)
-                if (forwardOp == 0) {
-                    // if forward payload opcode is 0: it's a simple Jetton transfer with comment
-                    comment = forwardPayload.loadStringTail()
+                if (forwardPayload.remainingBits >= 32) {
+                    const forwardOp = forwardPayload.loadUint(32)
+                    if (forwardOp == 0) {
+                        // if forward payload opcode is 0: it's a simple Jetton transfer with comment
+                        comment = forwardPayload.loadStringTail()
+                    }
                 }
+                depositEventList.push({
+                    comment,
+                    txhash: tx.hash().toString('hex'),
+                    tokenName: findSupportJetton.tokenName,
+                    jettonAmount: BigNumber(jettonAmount.toString()).div(BigNumber(10).pow(findSupportJetton.decimal)).toString(),
+                    jettonSender: jettonSender.toString()
+                })
+            }catch(e) {
+                console.log(e)
             }
-            depositEventList.push({
-                comment,
-                txhash: tx.hash().toString('hex'),
-                tokenName: findSupportJetton.tokenName,
-                jettonAmount: BigNumber(jettonAmount.toString()).div(findSupportJetton.decimal).toString(),
-                jettonSender: jettonSender.toString()
-            })
+            
         }
         return depositEventList
     }
