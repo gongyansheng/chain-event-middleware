@@ -8,3 +8,5 @@ export { BaseIdUtils } from './dataBase/BaseIdUtils'
 export { ERC20Event } from './evm/ERC20Event'
 
 export { TonDeposit } from './ton/TonDeposit'
+
+export { NotifyGame } from './game/NotifyGame'
