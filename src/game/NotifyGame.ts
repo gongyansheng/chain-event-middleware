@@ -42,7 +42,10 @@ export class NotifyGame {
     async selectNeedNotify<T extends { id?: any, chainid?: any }, V >(whereInput: T , isCheckFail: boolean): Promise<V> {
         this.baseId = await this.baseIdUtils.getBaseId()
         whereInput.id = { gt: this.baseId }
-        const needNotifyList = await this.table.findMany(whereInput)
+        const needNotifyList = await this.table.findMany({
+            where: whereInput,
+            take: 30
+        })
         if(isCheckFail) {
             await this.checkFail(whereInput.chainid)
         }

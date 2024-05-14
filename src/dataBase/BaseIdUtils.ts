@@ -28,7 +28,8 @@ export class BaseIdUtils {
     private async queryBaseId(limit: number) {
         let maxId = await this.table.findFirst({
             orderBy: { id: 'desc'}
-        }).then((res: any) => res.id )
+        }).then((res: any) => res?.id )
+        if(!maxId) return 0
         let startId = BigInt(0)
         if(maxId > BigInt(limit+100)) {
             startId = maxId - BigInt(limit)
