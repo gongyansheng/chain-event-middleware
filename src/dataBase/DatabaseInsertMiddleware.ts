@@ -28,6 +28,7 @@ export class DatabaseInsertMiddleware{
             if(dataList.length <= 0) return
             await table.createMany({ data: dataList })
             this.addCatchList(dataList, filed)
+            return dataList
         }catch(e: any){
             const billidIsRepeat = e.message.includes('Unique constraint failed')
             if(!billidIsRepeat) throw e
@@ -46,6 +47,7 @@ export class DatabaseInsertMiddleware{
 
             await table.createMany({ data: dataList })
             this.addCatchList(dataList, filed)
+            return dataList
         }
     }
     
