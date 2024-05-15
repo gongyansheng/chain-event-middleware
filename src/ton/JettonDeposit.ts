@@ -1,6 +1,7 @@
 import { TonClient, Address, JettonMaster } from '@ton/ton'
 import { jettonMasterAndWalletMap, depositEvent, jettonMasterAndWallet } from './interface'
 import BigNumber from 'bignumber.js'
+import { delay, callApi } from '../utils/index'
 
 
 export class JettonDeposit {
@@ -19,14 +20,18 @@ export class JettonDeposit {
     async getJettonWallet(): Promise<jettonMasterAndWalletMap[]>{
         const jettonMasterAndWalletMapList: jettonMasterAndWalletMap[] = []
         for(const jettonMasterAddress of this.jettonMasterList) {
-            const jettonMaster = this.client.open(JettonMaster.create(jettonMasterAddress.jettonMasterAddress))
-            const myJettonAddress = await jettonMaster.getWalletAddress(this.myAddress)
-            jettonMasterAndWalletMapList.push({
-                jettonMasterAddress: jettonMasterAddress.jettonMasterAddress,
-                JettonWallet: myJettonAddress,
-                decimal: jettonMasterAddress.decimal,
-                tokenName: jettonMasterAddress.tokenName
+            await delay(1000)
+            await callApi(async () => {
+                const jettonMaster = this.client.open(JettonMaster.create(jettonMasterAddress.jettonMasterAddress))
+                const myJettonAddress = await jettonMaster.getWalletAddress(this.myAddress)
+                jettonMasterAndWalletMapList.push({
+                    jettonMasterAddress: jettonMasterAddress.jettonMasterAddress,
+                    JettonWallet: myJettonAddress,
+                    decimal: jettonMasterAddress.decimal,
+                    tokenName: jettonMasterAddress.tokenName
+                })    
             })
+            
         }
         this.jettonMasterAndWalletMapList = jettonMasterAndWalletMapList
         return jettonMasterAndWalletMapList
