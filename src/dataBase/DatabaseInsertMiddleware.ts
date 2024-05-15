@@ -25,7 +25,7 @@ export class DatabaseInsertMiddleware{
         try{
 
             dataList = this.filterCatch(dataList, filed)
-            if(dataList.length <= 0) return
+            if(dataList.length <= 0) return []
             await table.createMany({ data: dataList })
             this.addCatchList(dataList, filed)
             return dataList
@@ -43,7 +43,7 @@ export class DatabaseInsertMiddleware{
             
             this.addCatchList(existList, filed)
 
-            if(dataList.length <= 0) return
+            if(dataList.length <= 0) return []
 
             await table.createMany({ data: dataList })
             this.addCatchList(dataList, filed)

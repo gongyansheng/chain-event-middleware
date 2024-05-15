@@ -23,11 +23,11 @@ export class EvmEvent {
     }
 
 
-    async getEvent<T>(lastBlockNumber: number, blockDiff = 10): Promise<T[]> {
+    async getEvent<T>(lastBlockNumber: number, blockDiff = 10): Promise<{ logs: T[], lastBlock: number }> {
         const provider = this.provider
         const currentBlock = await provider.getBlockNumber()
         const startBlock = Number(lastBlockNumber) - blockDiff
-        const lastBlock = (Number(lastBlockNumber) + blockDiff) > currentBlock ? currentBlock : lastBlockNumber + blockDiff
+        const lastBlock: number = (Number(lastBlockNumber) + blockDiff) > currentBlock ? currentBlock : lastBlockNumber + blockDiff
         
         const filter: ethers.providers.Filter = {
             address: this.contractAddress,
@@ -46,7 +46,7 @@ export class EvmEvent {
             delete logitem.eventFragment;
             logitems.push(logitem);
         }
-        return logitems
+        return { logs: logitems, lastBlock }
     }
 
     
