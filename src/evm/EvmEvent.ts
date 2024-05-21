@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import { SIGNING_ABI_ETHERS } from './abi'
-import { depositEvent } from './interface'
+import { depositEvent, depositERC20Event } from './interface'
 import BigNumber from 'bignumber.js'
 
 export class EvmEvent {
@@ -71,7 +71,25 @@ export class EvmEvent {
     // formatERC20RechargeEvent(logs: any[], eventName='OnGameRechargeERC20') {
     //     return logs.filter((item) => item.name === eventName)
     // }
-    
+    formatERC20RechargeEvent(logs: any[], tokenList: { tokenid: number, tokenName: string, decimal: number,  }[], eventName='OnGameRechargeERC20',): depositERC20Event[] {
+        logs = logs.filter((item) => item.name === eventName)
+        const resultList: depositERC20Event[] = []
+        for(const log of logs) {
+            const tokenInfo = tokenList.find((item) => item.tokenid === log.args.tokenid.toNumber())
+            if(!tokenInfo) continue
+            const args = log.args
+            resultList.push({
+                comment: args.comment,
+                timestamp: args.timestamp.toNumber(),
+                txhash: log.transactionHash,
+                tokenName: tokenInfo.tokenName,
+                amount: args.amount ? BigNumber(args.amount.toString()).dividedBy(10 ** tokenInfo.decimal).toString() : '',
+                sender: args.wallet,
+                tokenid: args.tokenid.toNumber(),
+            })
+        }
+        return resultList
+    }    
 
     
 }

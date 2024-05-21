@@ -8,3 +8,8 @@ export interface depositEvent {
     amount: string,
     sender: string
 }
+
+
+export interface depositERC20Event extends depositEvent{
+    tokenid: number
+}
