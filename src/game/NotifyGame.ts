@@ -18,13 +18,13 @@ export class NotifyGame {
     }
 
 
-    async checkFail(chainid?: number) {
+    async checkFail(chainid: number, filed: 'status' | 'notify_status') {
         if(new Date().getMinutes()%10 === 0) {
             var currentTime = new Date();
             var tenMinutesAgo = new Date(currentTime.getTime() - 10 * 60 * 1000);
 
             const needResetList = await this.table.findMany({
-                where: { chainid, id: { gt: this.baseId }, status: StatusEnum.processing, resultcode: '99', updated: { lt: tenMinutesAgo } },
+                where: { chainid, id: { gt: this.baseId }, [filed]: StatusEnum.processing, resultcode: '99', updated: { lt: tenMinutesAgo } },
                 take: 50
             })
             if(needResetList.length) {
@@ -39,7 +39,7 @@ export class NotifyGame {
         }
     }
     
-    async selectNeedNotify<T extends { id?: any, chainid?: any }, V >(whereInput: T , isCheckFail: boolean): Promise<V> {
+    async selectNeedNotify<T extends { id?: any, chainid?: any }, V >(whereInput: T , isCheckFail: boolean, filed: 'status' | 'notify_status' = 'status'): Promise<V> {
         this.baseId = await this.baseIdUtils.getBaseId()
         whereInput.id = { gt: this.baseId }
         const needNotifyList = await this.table.findMany({
@@ -47,7 +47,7 @@ export class NotifyGame {
             take: 30
         })
         if(isCheckFail) {
-            await this.checkFail(whereInput.chainid)
+            await this.checkFail(whereInput.chainid, filed)
         }
 
         if(needNotifyList.length <= 0) return [] as V
