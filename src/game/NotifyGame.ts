@@ -31,7 +31,8 @@ export class NotifyGame {
                 await this.table.updateMany({
                     where: { id: { in: needResetList.map((item: any) => item.id) } },
                     data: {
-                        status: StatusEnum.pending,
+                        [filed]: StatusEnum.pending,
+                        resultcode: '99',
                         updated: new Date()
                     }
                 })
