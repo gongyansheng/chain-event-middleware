@@ -18,7 +18,9 @@ export class EvmEvent {
         this.focusEvents = [
             this.signingInterface.getEventTopic("OnTaskSign"), 
             this.signingInterface.getEventTopic("OnGameSign"), 
-            this.signingInterface.getEventTopic("OnGameRecharge")
+            this.signingInterface.getEventTopic("OnGameRecharge"),
+            this.signingInterface.getEventTopic("OnGameRechargeERC20")
+            
         ];
     }
 
