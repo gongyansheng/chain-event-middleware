@@ -48,7 +48,7 @@ export class TonDeposit {
                     txhash: tx.hash().toString('hex'),
                     tokenName: this.tokenName,
                     jettonAmount: fromNano(value),
-                    jettonSender: sender.toString()
+                    jettonSender: sender.toString({ urlSafe: true, bounceable: false })
                 })
             }catch(e) {
                 console.log(e)

@@ -83,7 +83,7 @@ export class JettonDeposit {
                     txhash: tx.hash().toString('hex'),
                     tokenName: findSupportJetton.tokenName,
                     jettonAmount: BigNumber(jettonAmount.toString()).div(BigNumber(10).pow(findSupportJetton.decimal)).toString(),
-                    jettonSender: jettonSender.toString()
+                    jettonSender: jettonSender.toString({ urlSafe: true, bounceable: false })
                 })
             }catch(e) {
                 console.log(e)
