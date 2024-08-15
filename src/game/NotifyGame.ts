@@ -54,7 +54,7 @@ export class NotifyGame {
         if(needNotifyList.length <= 0) return [] as V
         await this.table.updateMany({
             where: { id: { in: needNotifyList.map((item: any) => item.id) } },
-            data: { status: StatusEnum.processing, updated: new Date()}
+            data: { [filed]: StatusEnum.processing, updated: new Date()}
         })
         return needNotifyList as V
     }
